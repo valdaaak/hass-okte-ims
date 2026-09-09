@@ -1,0 +1,25 @@
+# NIKDY necommitovať credentials ani stiahnuté dáta
+secrets.json
+**/secrets.json
+downloads/
+**/downloads/
+out/
+**/out/
+sample/
+*.zip
+*.har
+capture.jsonl
+_dl_test.zip
+_probe_resp.html
+__pycache__/
+**/__pycache__/
+*.pyc
+
+# dev / probe skripty (interné IP, nepatria do public repo)
+cdp_capture.py
+analyze_capture.py
+scrub_capture.py
+verify_range.py
+verify_stat.py
+diportal_client.py
+list_vrb.py

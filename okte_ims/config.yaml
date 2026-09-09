@@ -1,0 +1,42 @@
+name: OKTE IMS Import
+version: "1.0.8"
+slug: okte_ims
+description: >-
+  Denný import spotreby elektriny z OKTE IMS (ims.okte.sk) do Home Assistant
+  long-term statistics / Energy dashboardu.
+arch:
+  - aarch64
+  - amd64
+init: false
+homeassistant_api: true
+hassio_api: true
+auth_api: true
+hassio_role: default
+options:
+  okte_username: ""
+  okte_password: ""
+  eic: ""
+  statistic_id: "okte:elektrina_spotreba"
+  statistic_name: "OKTE IMS – spotreba zo siete"
+  backfill_days: 14
+  run_hour: 6
+  alarm_enabled: true
+  alarm_multiplier: 2.0
+  alarm_min_kwh: 3.0
+  notify_service: "notify.pushover"
+  ha_token: ""
+  ha_ws_url: ""
+schema:
+  okte_username: str
+  okte_password: password
+  eic: str
+  statistic_id: str
+  statistic_name: str
+  backfill_days: int(1,62)
+  run_hour: int(0,23)
+  alarm_enabled: bool
+  alarm_multiplier: float
+  alarm_min_kwh: float
+  notify_service: str
+  ha_token: "password?"
+  ha_ws_url: "str?"
