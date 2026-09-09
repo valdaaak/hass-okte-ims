@@ -18,7 +18,3 @@ Detaily a všetky voľby v [okte_ims/README.md](okte_ims/README.md).
   merania (Export po periódach), spočíta hodinové kWh a naimportuje ich ako long-term statistics.
 - Denný inkrement nadväzuje kumulatívny súčet na existujúcu históriu.
 - Voliteľný alarm pri náraste dennej spotreby (≥ N× predošlý deň) cez HA `notify` službu.
-
-## Bezpečnosť
-- **Žiadne credentials v repozitári** — meno, heslo, EIC a token sa zadávajú len v nastaveniach
-  add-onu a zostávajú lokálne v tvojej Home Assistant inštalácii.
