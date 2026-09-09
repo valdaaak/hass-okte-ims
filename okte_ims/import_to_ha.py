@@ -103,6 +103,20 @@ def call_notify(service, title, message):
         kw["context"] = c
     urllib.request.urlopen(req, **kw).read()
 
+def set_ha_sensor(entity_id, state, attributes):
+    """Nastaví stav senzora v HA cez REST (pre zrkadlenie na druhú HA cez remote_homeassistant)."""
+    import urllib.request
+    base = HA_WS.replace("wss://", "https://").replace("ws://", "http://").split("/api/")[0]
+    url = "%s/api/states/%s" % (base, entity_id)
+    body = json.dumps({"state": state, "attributes": attributes}).encode("utf-8")
+    req = urllib.request.Request(url, data=body, method="POST",
+        headers={"Authorization": "Bearer " + get_token(), "Content-Type": "application/json"})
+    kw = {"timeout": 20}
+    if base.startswith("https://"):
+        c = ssl.create_default_context(); c.check_hostname = False; c.verify_mode = ssl.CERT_NONE
+        kw["context"] = c
+    urllib.request.urlopen(req, **kw).read()
+
 async def send_to_ha(stats):
     import websockets
     meta = {"has_mean": False, "has_sum": True, "name": STAT_NAME,

@@ -347,6 +347,17 @@ def run(eic, d_from, d_to, out_dir, do_import=True, incremental=False):
     print("HA import success:", resp.get("success"))
     if incremental and resp.get("success"):
         alarm_check(hourly)
+    # živý senzor na zrkadlenie na druhú HA cez remote_homeassistant (voliteľné)
+    ms = os.getenv("OKTE_MIRROR_SENSOR", "").strip()
+    if resp.get("success") and ms:
+        try:
+            IMP.set_ha_sensor(ms, round(stats[-1]["sum"], 3),
+                {"unit_of_measurement": "kWh", "device_class": "energy",
+                 "state_class": "total_increasing",
+                 "friendly_name": os.getenv("OKTE_STAT_NAME", "OKTE IMS spotreba")})
+            print("[mirror] senzor %s = %.1f kWh" % (ms, stats[-1]["sum"]))
+        except Exception as e:
+            print("[mirror] set senzora zlyhalo:", e)
 
 def _argval(flag, default=None):
     if flag in sys.argv:

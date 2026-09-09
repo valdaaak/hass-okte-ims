@@ -35,6 +35,7 @@ def main():
     os.environ["OKTE_ALARM_MULT"] = str(opt("alarm_multiplier", 2.0))
     os.environ["OKTE_ALARM_MIN"] = str(opt("alarm_min_kwh", 3.0))
     os.environ["OKTE_NOTIFY"] = str(opt("notify_service", "notify.pushover"))
+    os.environ["OKTE_MIRROR_SENSOR"] = str(opt("mirror_sensor", ""))
     days = int(opt("backfill_days", 14))
     run_hour = int(opt("run_hour", 6))
 
