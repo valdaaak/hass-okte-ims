@@ -117,6 +117,29 @@ def set_ha_sensor(entity_id, state, attributes):
         kw["context"] = c
     urllib.request.urlopen(req, **kw).read()
 
+def mirror_attrs():
+    """Atribúty zrkadleného senzora (rovnaké pri dennom behu aj pri obnove po reštarte HA)."""
+    return {"unit_of_measurement": "kWh", "device_class": "energy",
+            "state_class": "total_increasing",
+            "friendly_name": os.getenv("OKTE_STAT_NAME", "OKTE IMS spotreba")}
+
+def get_ha_state(entity_id):
+    """Stav entity cez REST; None ak entita v HA neexistuje (404)."""
+    import urllib.request, urllib.error
+    base = HA_WS.replace("wss://", "https://").replace("ws://", "http://").split("/api/")[0]
+    req = urllib.request.Request("%s/api/states/%s" % (base, entity_id),
+        headers={"Authorization": "Bearer " + get_token()})
+    kw = {"timeout": 20}
+    if base.startswith("https://"):
+        c = ssl.create_default_context(); c.check_hostname = False; c.verify_mode = ssl.CERT_NONE
+        kw["context"] = c
+    try:
+        return json.loads(urllib.request.urlopen(req, **kw).read()).get("state")
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return None
+        raise
+
 async def send_to_ha(stats):
     import websockets
     meta = {"has_mean": False, "has_sum": True, "name": STAT_NAME,

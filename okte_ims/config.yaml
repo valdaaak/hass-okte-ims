@@ -1,5 +1,5 @@
 name: OKTE IMS Import
-version: "1.0.9"
+version: "1.0.10"
 slug: okte_ims
 description: >-
   Denný import spotreby elektriny z OKTE IMS (ims.okte.sk) do Home Assistant

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """HA add-on entrypoint: číta /data/options.json, denne spúšťa inkrementálny import z OKTE IMS."""
-import json, os, time, subprocess, datetime
+import json, os, time, subprocess, datetime, threading, asyncio
 from zoneinfo import ZoneInfo
 
 OPTS = "/data/options.json"
@@ -12,6 +12,27 @@ def opt(k, d=None):
         return json.load(open(OPTS, encoding="utf-8")).get(k, d)
     except Exception:
         return d
+
+MIRROR_CHECK_S = 300
+
+def mirror_watch():
+    """Senzor zapísaný cez REST /api/states reštart HA neprežije (add-on beží ďalej, senzor zmizne).
+    Každých 5 min skontroluje, či v HA je; ak chýba alebo je unknown/unavailable, zapíše posledný sum štatistiky."""
+    ms = os.environ.get("OKTE_MIRROR_SENSOR", "").strip()
+    if not ms:
+        return
+    import import_to_ha as IMP          # až po nastavení env (modul číta HA_WS/STAT_ID pri importe)
+    while True:
+        try:
+            st = IMP.get_ha_state(ms)
+            if st is None or st in ("unknown", "unavailable"):
+                s = asyncio.run(IMP.get_last_sum(datetime.datetime.now(TZ)))
+                if s > 0:
+                    IMP.set_ha_sensor(ms, round(s, 3), IMP.mirror_attrs())
+                    print("[mirror] %s chýbal (%s) -> obnovený na %.3f kWh" % (ms, st, s), flush=True)
+        except Exception as e:
+            print("[mirror] kontrola zlyhala (HA asi štartuje): %s" % e, flush=True)
+        time.sleep(MIRROR_CHECK_S)
 
 def main():
     os.environ["OKTE_ADDON"] = "1"          # nikdy nechodíme na dev SMB cestu
@@ -47,6 +68,8 @@ def main():
 
     print("[okte_ims] štart. Denne o %02d:00 (Europe/Bratislava), posledných %d dní, EIC %s -> %s"
           % (run_hour, days, os.environ["OKTE_EIC"], os.environ["OKTE_STAT_ID"]), flush=True)
+
+    threading.Thread(target=mirror_watch, daemon=True).start()
 
     while True:
         print("[okte_ims] beh %s" % datetime.datetime.now(TZ).isoformat(timespec="seconds"), flush=True)

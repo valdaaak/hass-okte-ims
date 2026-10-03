@@ -37,6 +37,7 @@ OKTE je národný hub inteligentného merania (IMS) na Slovensku; portál dáva 
 | `notify_service` | `notify.pushover` | HA notify služba pre alarm |
 | `ha_token` | — | Long-lived token HA (potrebný, ak Supervisor add-onu token neposkytne) |
 | `ha_ws_url` | *(auto)* | Ručné prepísanie WebSocket URL do HA |
+| `mirror_sensor` | — | Voliteľný živý senzor (napr. `sensor.okte_elektrina_spotreba`) s kumulatívom kWh na zrkadlenie do inej HA cez remote_homeassistant. Senzor zapísaný cez REST reštart HA neprežije, preto ho add-on každých 5 min kontroluje a po reštarte HA obnoví z poslednej hodnoty štatistiky. |
 
 ## Historický backfill
 Denný beh sťahuje len posledné dni. Na natiahnutie celej histórie sa dá jednorazovo
